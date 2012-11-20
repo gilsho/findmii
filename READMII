@@ -1,0 +1,25 @@
+Please read the course project webpage, the information session slides  and
+all comments in the ".m" files and ".cpp" files carefully. If you have any
+question, please post them on Piazza.
+
+Steps to building:
+1) Copy the sample code from the findMii directory to your local directory. The datafiles can stay in the class directory, just be sure to update your references.
+
+2) You MUST run the following command before you can make and run your programs: 
+setenv LD_LIBRARY_PATH /afs/ir/class/cs231a/opencv/lib
+
+3) Modify the Makefile to build your target *.CPP files.
+
+4) Type "make" at the command prompt. 
+
+ 
+MATLAB Files:
+
+ClickMii.m                
+PlayMii.m       
+FindMiiTask1Level1.m
+FindMiiMain.m             
+
+EXAMPLE CPP FILES
+opencvexample.cpp
+facedetect.cpp
