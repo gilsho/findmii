@@ -29,9 +29,11 @@ addpath('sift-class/KeypointMatch');
 
 
 datadir = [dir 'data/'];
-click = FindMiiTask1Level1(datadir);
+%click = FindMiiTask1Level1(datadir);
+%ClickMii([datadir 't1l1.avi'], [dir 'gt/' 't1l1.gt'], click);
 
-ClickMii([datadir 't1l1.avi'], [dir 'gt/' 't1l1.gt'], click);
+click = FindMiiTask1Level2(datadir);
+ClickMii([datadir 't1l2.avi'], [dir 'gt/' 't1l1.gt'], click);
 
 % ClickMii() will save an image (for each click you made) showing the frame 
 % you clicked on, with a red circle overlaid, centering at your click, and

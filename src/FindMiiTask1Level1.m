@@ -38,7 +38,7 @@ function click = FindMiiTask1Level1(datadir)
 
 % Read the reference image, only do this for task 1 (all levels)
 % Change filename for level 2 and 3
-ref_img = imread([datadir 'ref-task1level3.bmp']);
+ref_img = imread([datadir 'ref-task1level1.bmp']);
 
 % We have 150 frames for task 1 level 1,
 % change the number accordingly for other tasks and levels
