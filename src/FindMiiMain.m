@@ -23,6 +23,11 @@
 
 function FindMiiMain(dir)
 
+addpath('sift-class');
+addpath('sift-class/KeypointDetect');
+addpath('sift-class/KeypointMatch');
+
+
 datadir = [dir 'data/'];
 click = FindMiiTask1Level1(datadir);
 
