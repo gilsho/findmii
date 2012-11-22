@@ -37,16 +37,26 @@ A = faceAffinityMatrix(faces);
 [minvalscol mindexcol] = min(A);
 [~, mindexrow] = min(minvalscol);
 
-c = randomColor();
 index1 = mindexrow;
-newimg = highlightBox(img, [ylow(index1), xlow(index1)], ...
-              xhigh(index1)-xlow(index1), yhigh(index1)-ylow(index1),... 
-              BOX_WIDTH,ALPHA, c);
 index2 = mindexcol(mindexrow);
-newimg = highlightBox(newimg, [ylow(index2), xlow(index2)], ...
-              xhigh(index2)-xlow(index2), yhigh(index2)-ylow(index2),... 
-              BOX_WIDTH,ALPHA, c);
-imshow(newimg);
+
+xclick1 = xlow(index1) + (xhigh(index1)-xlow(index1))/2;
+yclick1 = ylow(index1) + (yhigh(index1)-ylow(index1))/3;
+
+xclick2 = xlow(index2) + (xhigh(index2)-xlow(index2))/2;
+yclick2 = ylow(index2) + (yhigh(index2)-ylow(index2))/3;
+
+%c = randomColor();
+%newimg = highlightBox(img, [ylow(index1), xlow(index1)], ...
+%              xhigh(index1)-xlow(index1), yhigh(index1)-ylow(index1),... 
+%              BOX_WIDTH,ALPHA, c);
+%newimg = highlightBox(newimg, [ylow(index2), xlow(index2)], ...
+%              xhigh(index2)-xlow(index2), yhigh(index2)-ylow(index2),... 
+%              BOX_WIDTH,ALPHA, c);
+%imshow(newimg);
+
+clicks(1,:) = [1 xclick1, yclick1];
+clicks(2,:) = [1 xclick2, yclick2];
 
     
 end

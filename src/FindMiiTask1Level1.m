@@ -31,44 +31,60 @@
 
 function click = FindMiiTask1Level1(datadir)
 
-
-
-
-% The following are example code for you to do the job in matlab.
-
 % Read the reference image, only do this for task 1 (all levels)
 % Change filename for level 2 and 3
-ref_img = imread([datadir 'ref-task1level1.bmp']);
+ref_img = imread([datadir 'ref-task1level2.bmp']);
 
 % We have 150 frames for task 1 level 1,
 % change the number accordingly for other tasks and levels
 mov_input = mmreader([datadir 't1l1.avi']);
 img = read(mov_input,1);
 
+%hardcoded faces coordinates
+ylow    = [50  50  50  50  ...
+           115 115 115 115 ...
+           192 192 192 192 ...
+           296 296 296 296];
 
+yhigh   = [130 130 130 130 ...
+           191 191 191 191 ...
+           290 290 290 290 ...
+           400 400 400 400];
+
+xlow    = [194 270 362 463 ...
+           159 269 372 479 ...
+           132 257 374 496 ...
+           97  235 389 530];
+
+xhigh   = [257 350 445 539 ...
+           241 350 454 561 ...
+           220 347 463 596 ...
+           197 337 491 633];
+
+numfaces = numel(ylow);
+faces = cell(numfaces,1);
+for i=1:numfaces
+    faces{i} = img(ylow(i):yhigh(i),xlow(i):xhigh(i),:);
+end
 
 
 % Detect the SIFT features:
-fprintf(1,'Computing the SIFT features for reference image...\n');
+fprintf(1,'Computing the SIFT features for face in reference image...\n');
 [ref_features,ref_pyr,ref_imp,ref_keys] = detect_features(ref_img);
-
-fprintf(1,'Computing the SIFT features for first frame of video...\n');
-[features,pyr,imp,keys] = detect_features(img);
-
-
-keypoints = features(:,[1:3 6]);
 ref_keypoints = ref_features(:,[1:3 6]);
-
-descriptors  = mySIFTdescriptor(img,keypoints);
 ref_descriptors = mySIFTdescriptor(ref_img,ref_keypoints);
 
-%transpose features and descriptors matrices
-keypoints = keypoints';
-ref_keypoints = ref_keypoints';
-features = features';
-ref_features = ref_features';
-descriptors = descriptors';
-ref_descriptors = ref_descriptors';
+fprintf(1,'Computing the SIFT features for faces in video');
+features = cell(numfaces,1);
+keypoints = cell(numfaces,1);
+descriptors = cell(numfaces,1);
+for i=1:numfaces
+    fprintf(1,'.');
+    [features{i},~,~,~] = detect_features(faces{i});
+    keypoints{i} = features{i}(:,[1:3 6]);
+    descriptors{i} = mySIFTdescriptor(faces{i},keypoints{i});
+end
+fprintf('\n');
 
 
 %PLOT DESCRIPTORS
@@ -78,19 +94,35 @@ ref_descriptors = ref_descriptors';
 %figure;
 %imagesc(ref_img);
 %hold on;
-%plotsiftdescriptor(ref_descriptors(1:n,:), ref_features(1:n,1:3));
+%plotsiftdescriptor(ref_descriptors(1:n,:)', ref_features(1:n,1:3)');
 %title('reference image with overlaid descriptors');
 %hold off;
 %figure;
 %imagesc(img);
 %hold on;
-%plotsiftdescriptor(descriptors(1:n,:), features(1:n,1:3));
+%plotsiftdescriptor(descriptors(1:n,:)', features(1:n,1:3)');
 %title('video image with overlaid descriptors');
 %hold off;
 
-threshold = 1;
 fprintf(1,'Matching keypoints...\n');
-matches = matchKeypoints(ref_descriptors,descriptors,threshold);
+ref_box = [40 40 120 120];
+minpts = 2;
+threshold = 0.9;
+score = zeros(numfaces,1);
+
+%[cx cy w h orient count] = getObjectRegion(ref_keypoints,keypoints,... 
+%                                                 matches, ref_box, minpts);
+
+for i=1:numfaces
+    matches = matchKeypoints(ref_descriptors',descriptors{i}',threshold);
+    if (numel(matches) > 0)
+        [cx,cy,w,h,orient,votes] = getObjectRegion(ref_keypoints',...
+                            keypoints{i}',matches, ref_box, minpts);
+        if (numel(votes) > 0)
+            score(i) = max(votes);
+        end
+    end
+end
 
 %PLOT MATCHES
 %figure;
@@ -98,29 +130,28 @@ matches = matchKeypoints(ref_descriptors,descriptors,threshold);
 %matchObject(ref_img, ref_descriptors, ref_keypoints, ref_box,img, descriptors, keypoints,threshold)
 
 
-ref_box = [40 40 120 120];
-minpts = 2;
+%look at bounding box. might not be necessary
+%ref_box = [40 40 120 120];
+%minpts = 2;
+%fprintf(1,'Extracting potential object regions...\n');
+%[cx cy w h orient count] = getObjectRegion(ref_keypoints,keypoints,... 
+%                                                 matches, ref_box, minpts);
+%if (numel(count) == 0)
+%   %no points 
+%end
+%if (numel(count) > 1)
+%   %need to sort results 
+%end
+                                            
+%[~, index] = max(count);
+%[xclick yclick] = getClickFromBox(cx(index),cy(index),w(index),...
+%                                  h(index),orient(index));
 
-fprintf(1,'Extracting potential object regions...\n');
-[cx cy w h orient count] = getObjectRegion(ref_keypoints,keypoints,... 
-                                                 matches, ref_box, minpts);
-
-                                             
-if (numel(count) == 0)
-   %no points 
-end
-
-if (numel(count) > 1)
-   %need to sort results 
-end
-                                             
-[~, index] = max(count);
+[~,index] = max(score);
+xclick = xlow(index) + (xhigh(index)-xlow(index))/2;
+yclick = ylow(index) + (yhigh(index)-ylow(index))/3;
 
 
-[xclick yclick] = getClickFromBox(cx(index),cy(index),w(index),...
-                                  h(index),orient(index));
-
-click  = [1 xclick yclick];
 fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',1,xclick,yclick);
 
 
