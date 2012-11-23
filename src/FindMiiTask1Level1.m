@@ -33,7 +33,7 @@ function click = FindMiiTask1Level1(datadir)
 
 % Read the reference image, only do this for task 1 (all levels)
 % Change filename for level 2 and 3
-ref_img = imread([datadir 'ref-task1level2.bmp']);
+ref_img = imread([datadir 'ref-task1level1.bmp']);
 
 % We have 150 frames for task 1 level 1,
 % change the number accordingly for other tasks and levels
@@ -70,58 +70,40 @@ end
 
 % Detect the SIFT features:
 fprintf(1,'Computing the SIFT features for face in reference image...\n');
-[ref_features,ref_pyr,ref_imp,ref_keys] = detect_features(ref_img);
-ref_keypoints = ref_features(:,[1:3 6]);
-ref_descriptors = mySIFTdescriptor(ref_img,ref_keypoints);
+imgbw = im2single(rgb2gray(ref_img));
+[ref_frames, ref_descriptors] = vl_covdet(imgbw,'method', 'DoG');
+
+
 
 fprintf(1,'Computing the SIFT features for faces in video');
-features = cell(numfaces,1);
+frames = cell(numfaces,1);
 keypoints = cell(numfaces,1);
 descriptors = cell(numfaces,1);
 for i=1:numfaces
     fprintf(1,'.');
-    [features{i},~,~,~] = detect_features(faces{i});
-    keypoints{i} = features{i}(:,[1:3 6]);
-    descriptors{i} = mySIFTdescriptor(faces{i},keypoints{i});
+    imgbw = im2single(rgb2gray(faces{i}));
+    [frames{i}, descriptors{i}] = vl_covdet(imgbw,'method', 'DoG');
 end
 fprintf('\n');
 
 
-%PLOT DESCRIPTORS
-%for clarity in the plotting, let's just choose the n "biggest" descriptors
-%(judged by the 2-norm of the vector)
-%n = 100; % Number of descriptors to plot. Feel free to play with this number.
-%figure;
-%imagesc(ref_img);
-%hold on;
-%plotsiftdescriptor(ref_descriptors(1:n,:)', ref_features(1:n,1:3)');
-%title('reference image with overlaid descriptors');
-%hold off;
-%figure;
-%imagesc(img);
-%hold on;
-%plotsiftdescriptor(descriptors(1:n,:)', features(1:n,1:3)');
-%title('video image with overlaid descriptors');
-%hold off;
-
 fprintf(1,'Matching keypoints...\n');
 ref_box = [40 40 120 120];
 minpts = 2;
-threshold = 0.9;
+threshold = 0.8;
 score = zeros(numfaces,1);
 
-%[cx cy w h orient count] = getObjectRegion(ref_keypoints,keypoints,... 
-%                                                 matches, ref_box, minpts);
-
 for i=1:numfaces
-    matches = matchKeypoints(ref_descriptors',descriptors{i}',threshold);
-    if (numel(matches) > 0)
-        [cx,cy,w,h,orient,votes] = getObjectRegion(ref_keypoints',...
-                            keypoints{i}',matches, ref_box, minpts);
-        if (numel(votes) > 0)
-            score(i) = max(votes);
-        end
-    end
+    matches = matchKeypoints(ref_descriptors,descriptors{i},threshold);
+    score(i) = numel(matches);
+    %ignore bounding box matching for now
+    %if (numel(matches) > 0)
+    %    [cx,cy,w,h,orient,votes] = getObjectRegion(ref_frames(1:4,:),...
+    %                        frames{i}(1:4,:),matches, ref_box, minpts);
+    %    if (numel(votes) > 0)
+    %        score(i) = max(votes);
+    %    end
+    %end
 end
 
 %PLOT MATCHES
@@ -154,6 +136,8 @@ yclick = ylow(index) + (yhigh(index)-ylow(index))/3;
 
 fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',1,xclick,yclick);
 
+
+%figure; imshow(plotPoints(img,[xclick yclick]));
 
 
     

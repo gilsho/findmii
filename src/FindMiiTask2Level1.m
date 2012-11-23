@@ -25,18 +25,17 @@ end
 
 fprintf(1,'Computing the SIFT features for faces in video');
 frames = cell(numfaces,1);
-keypoints = cell(numfaces,1);
+%keypoints = cell(numfaces,1);
 descriptors = cell(numfaces,1);
 for i=1:numfaces
     fprintf(1,'.');
-    [features{i},~,~,~] = detect_features(faces{i});
-    keypoints{i} = features{i}(:,[1:3 6]);
-    descriptors{i} = mySIFTdescriptor(faces{i},keypoints{i});
+    imgbw = im2single(rgb2gray(faces{i}));
+    [frames{i}, descriptors{i}] = vl_covdet(imgbw,'method', 'DoG');
 end
 fprintf('\n');
 
 fprintf(1,'Matching keypoints...\n');
-threshold = 0.9;
+threshold = 0.8;
 score = zeros(numfaces);
 minpts = 2;
 %ignore bounding box for now
@@ -45,7 +44,7 @@ for i=1:numfaces
         if (i == j)
             score(i,j) = 0;
         else
-            matches = matchKeypoints(descriptors{i}',descriptors{j}',threshold);
+            matches = matchKeypoints(descriptors{i},descriptors{j},threshold);
             score(i,j) = numel(matches);
             if (0)
             %if (numel(matches) > 0)
@@ -88,6 +87,7 @@ yclick2 = ylow(index2) + (yhigh(index2)-ylow(index2))/3;
 clicks(1,:) = [1 xclick1, yclick1];
 clicks(2,:) = [1 xclick2, yclick2];
 
+figure; imshow(plotPoints(img,clicks(:,2:3)));
     
 end
 
