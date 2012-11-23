@@ -84,8 +84,8 @@ yclick2 = ylow(index2) + (yhigh(index2)-ylow(index2))/3;
 %              BOX_WIDTH,ALPHA, c);
 %imshow(newimg);
 
-clicks(1,:) = [1 xclick1, yclick1];
-clicks(2,:) = [1 xclick2, yclick2];
+clicks(1,:) = [frame xclick1, yclick1];
+clicks(2,:) = [frame xclick2, yclick2];
 
 figure; imshow(plotPoints(img,clicks(:,2:3)));
     
