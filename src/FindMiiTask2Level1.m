@@ -11,16 +11,17 @@ img = read(mov_input,frame);
 
 
 %hardcoded faces coordinates
+%       ylow yhigh  xlow xhigh
+bbox = [80    180   231   311
+        80    180   405   495
+        198   297   197   293
+        198   297   417   518];
 
-ylow    = [80   80  198 198];
-yhigh   = [180  180 297 297];
-xlow    = [231  405 197 417];
-xhigh   = [311  495 293 518];
 
-numfaces = numel(ylow);
+numfaces = size(bbox,1);
 faces = cell(numfaces,1);
-for i=1:numel(ylow)
-    faces{i} = img(ylow(i):yhigh(i),xlow(i):xhigh(i),:);
+for i=1:numfaces
+    faces{i} = img(bbox(i,1):bbox(i,2),bbox(i,3):bbox(i,4),:);
 end
 
 fprintf(1,'Computing the SIFT features for faces in video');

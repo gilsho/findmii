@@ -41,30 +41,31 @@ mov_input = mmreader([datadir 't1l1.avi']);
 img = read(mov_input,1);
 
 %hardcoded faces coordinates
-ylow    = [50  50  50  50  ...
-           115 115 115 115 ...
-           192 192 192 192 ...
-           296 296 296 296];
 
-yhigh   = [130 130 130 130 ...
-           191 191 191 191 ...
-           290 290 290 290 ...
-           400 400 400 400];
-
-xlow    = [194 270 362 463 ...
-           159 269 372 479 ...
-           132 257 374 496 ...
-           97  235 389 530];
-
-xhigh   = [257 350 445 539 ...
-           241 350 454 561 ...
-           220 347 463 596 ...
-           197 337 491 633];
-
-numfaces = numel(ylow);
+bbox = zeros(16,4);
+%      ylow yhigh xlow xhigh
+bbox = [50    130   194   257
+        50    130   270   350
+        50    130   362   445
+        50    130   463   539
+        115   191   159   241
+        115   191   269   350
+        115   191   372   454
+        115   191   479   561
+        192   290   132   220
+        192   290   257   347
+        192   290   374   463
+        192   290   496   596
+        296   400    97   197
+        296   400   235   337
+        296   400   389   491
+        296   400   530   633];
+   
+   
+numfaces = size(bbox,1);
 faces = cell(numfaces,1);
 for i=1:numfaces
-    faces{i} = img(ylow(i):yhigh(i),xlow(i):xhigh(i),:);
+    faces{i} = img(bbox(i,1):bbox(i,2),bbox(i,3):bbox(i,4),:);
 end
 
 
@@ -136,6 +137,7 @@ yclick = ylow(index) + (yhigh(index)-ylow(index))/3;
 
 fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',1,xclick,yclick);
 
+click = [frame xclick, yclick];
 
 %figure; imshow(plotPoints(img,[xclick yclick]));
 
