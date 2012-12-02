@@ -8,11 +8,11 @@ function newimg = plotPoints(img,P)
 
 [m n] = size(P);
 
-CIRCLE_WIDTH = 1;
+CIRCLE_WIDTH = 5;
 DEFAULT_SCALE = 1;
 ALPHA = 0;
 
-clr = [0 0 255]; %blue
+clr = [0 255 0]; %green
 
 newimg = img;
 for i=1:m

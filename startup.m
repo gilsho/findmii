@@ -13,3 +13,6 @@ addpath('src/flow_code_v2/utils/downloaded');
 addpath('src/flow_code_v2/utils/flowColorCode');
 addpath('src/flow_code_v2/utils/mex');
 
+addpath('src/edison_matlab_interface');
+run('src/edison_matlab_interface/compile_edison_wrapper');
+

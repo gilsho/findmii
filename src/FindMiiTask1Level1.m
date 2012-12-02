@@ -31,6 +31,7 @@
 
 function click = FindMiiTask1Level1(datadir)
 
+
 % Read the reference image, only do this for task 1 (all levels)
 % Change filename for level 2 and 3
 ref_img = imread([datadir 'ref-task1level1.bmp']);
@@ -38,7 +39,8 @@ ref_img = imread([datadir 'ref-task1level1.bmp']);
 % We have 150 frames for task 1 level 1,
 % change the number accordingly for other tasks and levels
 mov_input = mmreader([datadir 't1l1.avi']);
-img = read(mov_input,1);
+lastframe = 1;
+img = read(mov_input,lastframe);
 
 %hardcoded faces coordinates
 
@@ -73,6 +75,8 @@ end
 fprintf(1,'Computing the SIFT features for face in reference image...\n');
 imgbw = im2single(rgb2gray(ref_img));
 [ref_frames, ref_descriptors] = vl_covdet(imgbw,'method', 'DoG');
+ref_descriptors = enhancedSIFT(ref_img,ref_frames);
+
 
 
 
@@ -84,6 +88,7 @@ for i=1:numfaces
     fprintf(1,'.');
     imgbw = im2single(rgb2gray(faces{i}));
     [frames{i}, descriptors{i}] = vl_covdet(imgbw,'method', 'DoG');
+    descriptors{i} = enhancedSIFT(faces{i},frames{i});
 end
 fprintf('\n');
 
@@ -109,35 +114,16 @@ end
 
 %PLOT MATCHES
 %figure;
-%plotmatches(im2double(ref_img),im2double(img),ref_keypoints,keypoints,matches);
-%matchObject(ref_img, ref_descriptors, ref_keypoints, ref_box,img, descriptors, keypoints,threshold)
-
-
-%look at bounding box. might not be necessary
-%ref_box = [40 40 120 120];
-%minpts = 2;
-%fprintf(1,'Extracting potential object regions...\n');
-%[cx cy w h orient count] = getObjectRegion(ref_keypoints,keypoints,... 
-%                                                 matches, ref_box, minpts);
-%if (numel(count) == 0)
-%   %no points 
-%end
-%if (numel(count) > 1)
-%   %need to sort results 
-%end
-                                            
-%[~, index] = max(count);
-%[xclick yclick] = getClickFromBox(cx(index),cy(index),w(index),...
-%                                  h(index),orient(index));
+%plotmatches(im2double(ref_img),im2double(img),ref_frames,frames{2},matches);
 
 [~,index] = max(score);
-xclick = xlow(index) + (xhigh(index)-xlow(index))/2;
-yclick = ylow(index) + (yhigh(index)-ylow(index))/3;
+xclick = bbox(index,3) + (bbox(index,4)-bbox(index,3))/2;
+yclick = bbox(index,1) + (bbox(index,2)-bbox(index,1))/3;
 
 
 fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',1,xclick,yclick);
 
-click = [frame xclick, yclick];
+click = [lastframe xclick, yclick];
 
 %figure; imshow(plotPoints(img,[xclick yclick]));
 

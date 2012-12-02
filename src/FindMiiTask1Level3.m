@@ -9,17 +9,16 @@
 %
 %%-----------------------------------------------------------------------%%
 
-%function click = FindMiiTask1Level2(datadir)
+%function click = FindMiiTask1Level3(datadir)
 datadir = 'data/';
-
 
 % Read the reference image, only do this for task 1 (all levels)
 % Change filename for level 2 and 3
-ref_img = imread([datadir 'ref-task1level2.bmp']);
+ref_img = imread([datadir 'ref-task1level3.bmp']);
 
 % We have 150 frames for task 1 level 1,
 % change the number accordingly for other tasks and levels
-mov_input = mmreader([datadir 't1l2.avi']);
+mov_input = mmreader([datadir 't1l3.avi']);
 lastframe = 120;
 img = read(mov_input,lastframe);
 
@@ -33,19 +32,21 @@ ref_imgbw = im2single(rgb2gray(ref_img));
 % Detect the SIFT features:
 fprintf(1,'Computing the SIFT features for face in reference image...\n');
 
-[ref_frames, ref_descriptors] = vl_covdet(ref_imgbw,'method', 'DoG');
-ref_descriptors = enhancedSIFT(ref_img,ref_frames);
-%subplot(2,2,1); imshow(ref_img); subplot(2,2,2); vl_plotframe(ref_frame);
+[ref_frames, ref_descriptors] = vl_covdet(ref_imgbw,'method', 'DoG',...
+    'EstimateOrientation',true,'PeakThreshold',0.002);
+subplot(2,1,1); imshow(ref_img); hold on; vl_plotframe(ref_frames); hold off;
+%ref_descriptors = enhancedSIFT(ref_img,ref_frames);
+
 
 fprintf(1,'Computing the SIFT features for entire frame...\n');
-[frames, descriptors] = vl_covdet(imgbw,'method', 'DoG');
-descriptors = enhancedSIFT(img,frames);
-%subplot(2,2,3); imshow(img); subplot(2,2,4); vl_plotframe(frame);
+[frames, descriptors] = vl_covdet(imgbw,'method', 'DoG',...
+    'EstimateOrientation',true,'PeakThreshold',0.002);
+%descriptors = enhancedSIFT(img,frames);
+
+subplot(2,1,2); imshow(img); hold on; vl_plotframe(frames); hold off;
 
 
 fprintf(1,'Matching keypoints...');
-ref_box = [40 40 120 120];
-minpts = 2;
 threshold = 0.8;
 matches = matchKeypoints(ref_descriptors, descriptors, threshold);
 
