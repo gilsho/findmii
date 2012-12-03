@@ -14,7 +14,9 @@ datadir = 'data/';
 
 % Read the reference image, only do this for task 1 (all levels)
 % Change filename for level 2 and 3
+ratio = 0.6;
 ref_img = imread([datadir 'ref-task1level3.bmp']);
+ref_img = imresize(ref_img,ratio);
 
 % We have 150 frames for task 1 level 1,
 % change the number accordingly for other tasks and levels
@@ -47,7 +49,7 @@ subplot(2,1,2); imshow(img); hold on; vl_plotframe(frames); hold off;
 
 
 fprintf(1,'Matching keypoints...');
-threshold = 0.8;
+threshold = 0.9;
 matches = matchKeypoints(ref_descriptors, descriptors, threshold);
 
 %PLOT MATCHES

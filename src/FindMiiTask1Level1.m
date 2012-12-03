@@ -31,6 +31,10 @@
 
 function click = FindMiiTask1Level1(datadir)
 
+MAX_FRAME = 150;
+
+xclick = -1;
+yclick = -1;
 
 % Read the reference image, only do this for task 1 (all levels)
 % Change filename for level 2 and 3
@@ -39,8 +43,7 @@ ref_img = imread([datadir 'ref-task1level1.bmp']);
 % We have 150 frames for task 1 level 1,
 % change the number accordingly for other tasks and levels
 mov_input = mmreader([datadir 't1l1.avi']);
-lastframe = 1;
-img = read(mov_input,lastframe);
+
 
 %hardcoded faces coordinates
 
@@ -63,71 +66,71 @@ bbox = [50    130   194   257
         296   400   389   491
         296   400   530   633];
    
-   
+
 numfaces = size(bbox,1);
-faces = cell(numfaces,1);
-for i=1:numfaces
-    faces{i} = img(bbox(i,1):bbox(i,2),bbox(i,3):bbox(i,4),:);
+
+lastframe = 0;
+confidence = -Inf;
+CONFIDENCE_THRESHOLD = 1.5;
+
+while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
+    lastframe = lastframe + 1;
+    fprintf('Examining frame %d/%d...\n',lastframe,MAX_FRAME);
+    img = read(mov_input,lastframe);
+    
+    %EXTRACT FACES
+    faces = cell(numfaces,1);
+    for i=1:numfaces
+        faces{i} = img(bbox(i,1):bbox(i,2),bbox(i,3):bbox(i,4),:);
+    end
+
+    %DETECT SIFT FEATURES
+    fprintf(1,'Computing the SIFT features for face in reference image...\n');
+    imgbw = im2single(rgb2gray(ref_img));
+    [ref_frames, ref_descriptors] = vl_covdet(imgbw,'method', 'DoG');
+    %ref_descriptors = enhancedSIFT(ref_img,ref_frames);
+
+    fprintf(1,'Computing the SIFT features for faces in video');
+    frames = cell(numfaces,1);
+    keypoints = cell(numfaces,1);
+    descriptors = cell(numfaces,1);
+    for i=1:numfaces
+        fprintf(1,'.');
+        imgbw = im2single(rgb2gray(faces{i}));
+        [frames{i}, descriptors{i}] = vl_covdet(imgbw,'method', 'DoG');
+        %descriptors{i} = enhancedSIFT(faces{i},frames{i});
+    end
+    fprintf('\n');
+
+    
+    %MATCH KEYPOINTS
+    fprintf(1,'Matching keypoints...\n');
+    threshold = 0.8;
+    score = zeros(numfaces,1);
+    for i=1:numfaces
+        matches = matchKeypoints(ref_descriptors,descriptors{i},threshold);
+        score(i) = numel(matches);
+    end
+
+    %PLOT MATCHES
+    %figure;
+    %plotmatches(im2double(ref_img),im2double(img),ref_frames,frames{2},matches);
+    
+    
+    %CALCULATE CONFIDENCE LEVEL
+    [score_sorted,sorted_index] = sort(score,'Descend');    
+    confidence = score_sorted(1)/score_sorted(2);
 end
 
-
-% Detect the SIFT features:
-fprintf(1,'Computing the SIFT features for face in reference image...\n');
-imgbw = im2single(rgb2gray(ref_img));
-[ref_frames, ref_descriptors] = vl_covdet(imgbw,'method', 'DoG');
-ref_descriptors = enhancedSIFT(ref_img,ref_frames);
-
-
-
-
-fprintf(1,'Computing the SIFT features for faces in video');
-frames = cell(numfaces,1);
-keypoints = cell(numfaces,1);
-descriptors = cell(numfaces,1);
-for i=1:numfaces
-    fprintf(1,'.');
-    imgbw = im2single(rgb2gray(faces{i}));
-    [frames{i}, descriptors{i}] = vl_covdet(imgbw,'method', 'DoG');
-    descriptors{i} = enhancedSIFT(faces{i},frames{i});
-end
-fprintf('\n');
-
-
-fprintf(1,'Matching keypoints...\n');
-ref_box = [40 40 120 120];
-minpts = 2;
-threshold = 0.8;
-score = zeros(numfaces,1);
-
-for i=1:numfaces
-    matches = matchKeypoints(ref_descriptors,descriptors{i},threshold);
-    score(i) = numel(matches);
-    %ignore bounding box matching for now
-    %if (numel(matches) > 0)
-    %    [cx,cy,w,h,orient,votes] = getObjectRegion(ref_frames(1:4,:),...
-    %                        frames{i}(1:4,:),matches, ref_box, minpts);
-    %    if (numel(votes) > 0)
-    %        score(i) = max(votes);
-    %    end
-    %end
-end
-
-%PLOT MATCHES
-%figure;
-%plotmatches(im2double(ref_img),im2double(img),ref_frames,frames{2},matches);
-
-[~,index] = max(score);
+index = sorted_index(1);
 xclick = bbox(index,3) + (bbox(index,4)-bbox(index,3))/2;
 yclick = bbox(index,1) + (bbox(index,2)-bbox(index,1))/3;
 
-
-fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',1,xclick,yclick);
-
 click = [lastframe xclick, yclick];
 
-%figure; imshow(plotPoints(img,[xclick yclick]));
-
-
+%PLOT RESULTS
+fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',lastframe,xclick,yclick);
+figure; imshow(plotPoints(img,[xclick yclick]));
     
 % Scoring: correct click on frame 1 is worth 1 point, each frame
 % thereafter is discounted by 0.99. Score is averaged over multiple

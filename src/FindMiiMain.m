@@ -24,11 +24,8 @@
 function FindMiiMain(dir)
 
 datadir = [dir 'data/'];
-%click = FindMiiTask1Level1(datadir);
+%
 %ClickMii([datadir 't1l1.avi'], [dir 'gt/' 't1l1.gt'], click);
-
-click = FindMiiTask3Level2(datadir);
-ClickMii([datadir 't3l1.avi'], [dir 'gt/' 't3l2.gt'], click);
 
 % ClickMii() will save an image (for each click you made) showing the frame 
 % you clicked on, with a red circle overlaid, centering at your click, and
@@ -51,15 +48,17 @@ ClickMii([datadir 't3l1.avi'], [dir 'gt/' 't3l2.gt'], click);
 % FindMiiTask2Level3.m, call your OpenCV progrom in it, uncomment the
 % corresponding line below, and your result should be returned in 'click'.)
 
-% click = FindMiiTask1Level2(datadir);
-% click = FindMiiTask1Level3(datadir);
-% click = FindMiiTask2Level1(datadir);
-% click = FindMiiTask2Level2(datadir);
-% click = FindMiiTask2Level3(datadir);
-% click = FindMiiTask3Level1(datadir);
-% click = FindMiiTask3Level2(datadir);
-% click = FindMiiTask3Level3(datadir);
-% click = FindMiiTask4Level1(datadir);
-% click = FindMiiTask4Level2(datadir);
-% click = FindMiiTask4Level3(datadir);
+% click = FindMiiTask1Level1(datadir); ClickMii([datadir 't1l1.avi'], [dir 'gt/' 't1l1.gt'], click);
+% click = FindMiiTask1Level2(datadir); ClickMii([datadir 't1l2.avi'], [dir 'gt/' 't1l2.gt'], click);
+% click = FindMiiTask1Level3(datadir); ClickMii([datadir 't1l3.avi'], [dir 'gt/' 't1l3.gt'], click);
+% click = FindMiiTask2Level1(datadir); ClickMii([datadir 't2l1.avi'], [dir 'gt/' 't2l1.gt'], click);
+% click = FindMiiTask2Level2(datadir); ClickMii([datadir 't2l2.avi'], [dir 'gt/' 't2l2.gt'], click);
+% click = FindMiiTask2Level3(datadir); ClickMii([datadir 't2l3.avi'], [dir 'gt/' 't2l3.gt'], click);
+% click = FindMiiTask3Level1(datadir); ClickMii([datadir 't3l1.avi'], [dir 'gt/' 't3l1.gt'], click);
+% click = FindMiiTask3Level2(datadir); ClickMii([datadir 't3l2.avi'], [dir 'gt/' 't3l2.gt'], click);
+% click = FindMiiTask3Level3(datadir); ClickMii([datadir 't3l3.avi'], [dir 'gt/' 't3l3.gt'], click);
+% click = FindMiiTask4Level1(datadir); ClickMii([datadir 't4l1.avi'], [dir 'gt/' 't4l1.gt'], click);
+% click = FindMiiTask4Level2(datadir); ClickMii([datadir 't4l2.avi'], [dir 'gt/' 't4l2.gt'], click);
+% click = FindMiiTask4Level3(datadir); ClickMii([datadir 't4l3.avi'], [dir 'gt/' 't4l3.gt'], click);
 
+end

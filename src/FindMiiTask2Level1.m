@@ -1,14 +1,12 @@
 
 
 function clicks = FindMiiTask2Level1(datadir)
+datadir = 'data/';
 
-clicks = zeros(2,3);
+MAX_FRAME = 150;
 
 % change the number accordingly for other tasks and levels
 mov_input = mmreader([datadir 't2l1.avi']);
-frame = 1;
-img = read(mov_input,frame);
-
 
 %hardcoded faces coordinates
 %       ylow yhigh  xlow xhigh
@@ -17,78 +15,78 @@ bbox = [80    180   231   311
         198   297   197   293
         198   297   417   518];
 
-
 numfaces = size(bbox,1);
-faces = cell(numfaces,1);
-for i=1:numfaces
-    faces{i} = img(bbox(i,1):bbox(i,2),bbox(i,3):bbox(i,4),:);
-end
 
-fprintf(1,'Computing the SIFT features for faces in video');
-frames = cell(numfaces,1);
-%keypoints = cell(numfaces,1);
-descriptors = cell(numfaces,1);
-for i=1:numfaces
-    fprintf(1,'.');
-    imgbw = im2single(rgb2gray(faces{i}));
-    [frames{i}, descriptors{i}] = vl_covdet(imgbw,'method', 'DoG');
-end
-fprintf('\n');
+lastframe=0;
+CONFIDENCE_THRESHOLD = 1.4;    
+confidence = 0;
+while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
+    lastframe = lastframe + 1;
+    fprintf('Examining frame %d/%d...\n',lastframe,MAX_FRAME);
+    img = read(mov_input,lastframe);
+    
+    faces = cell(numfaces,1);
+    for i=1:numfaces
+        faces{i} = img(bbox(i,1):bbox(i,2),bbox(i,3):bbox(i,4),:);
+    end
 
-fprintf(1,'Matching keypoints...\n');
-threshold = 0.8;
-score = zeros(numfaces);
-minpts = 2;
-%ignore bounding box for now
-for i=1:numfaces
-    for j=1:numfaces
-        if (i == j)
-            score(i,j) = 0;
-        else
-            matches = matchKeypoints(descriptors{i},descriptors{j},threshold);
-            score(i,j) = numel(matches);
-            if (0)
-            %if (numel(matches) > 0)
-                cxbox = mean([xlow(i) xhigh(i)]);
-                cybox = mean([ylow(i) yhigh(i)]);
-                wbox = xhigh(i) - xlow(i);
-                hbox = yhigh(i) -  ylow(i);
-                box = [cxbox cybox wbox hbox]; 
-                [cx,cy,w,h,orient,votes] = getObjectRegion(keypoints{i}',...
-                            keypoints{j}',matches, box, minpts);
-                if (numel(votes) > 0)
-                    score(i,j) = max(votes);
-                end
+    %DETECT SIFT FEATURES
+    fprintf(1,'Computing the SIFT features for faces in video');
+    frames = cell(numfaces,1);
+    descriptors = cell(numfaces,1);
+    for i=1:numfaces
+        fprintf(1,'.');
+        imgbw = im2single(rgb2gray(faces{i}));
+        [frames{i}, descriptors{i}] = vl_covdet(imgbw,'method', 'DoG');
+    end
+    fprintf('\n');
+    
+    %MATCH KEYPOINTS
+    fprintf(1,'Matching keypoints...\n');
+    threshold = 0.8;
+    score = zeros(numfaces);
+    for i=1:numfaces
+        for j=1:numfaces
+            if (i == j)
+                score(i,j) = 0;
+            else
+                matches = matchKeypoints(descriptors{i},descriptors{j},threshold);
+                score(i,j) = numel(matches);
             end
         end
     end
+
+    %DETERMINE MATCH
+    [maxvalscol maxindexcol] = max(score);
+    [maxval, maxindexrow] = max(maxvalscol);
+
+    index1 = maxindexrow;
+    index2 = maxindexcol(maxindexrow);
+    
+    score_remaining = score;
+    score_remaining(index1,index2) = 0;
+    score_remaining(index2,index1) = 0;
+    
+    max_remaining = max(max(score_remaining));
+    
+    confidence = maxval./max_remaining;
+
 end
 
-[maxvalscol maxindexcol] = max(score);
-[~, maxindexrow] = max(maxvalscol);
+xclick1 = bbox(index1,3) + (bbox(index1,4)-bbox(index1,3))/2;
+yclick1 = bbox(index1,1) + (bbox(index1,2)-bbox(index1,1))/3;
 
-index1 = maxindexrow;
-index2 = maxindexcol(maxindexrow);
+xclick2 = bbox(index2,3) + (bbox(index2,4)-bbox(index2,3))/2;
+yclick2 = bbox(index2,1) + (bbox(index2,2)-bbox(index2,1))/3;
 
-xclick1 = xlow(index1) + (xhigh(index1)-xlow(index1))/2;
-yclick1 = ylow(index1) + (yhigh(index1)-ylow(index1))/3;
+clicks = zeros(2,3);
+clicks(1,:) = [lastframe xclick1, yclick1];
+clicks(2,:) = [lastframe xclick2, yclick2];
 
-xclick2 = xlow(index2) + (xhigh(index2)-xlow(index2))/2;
-yclick2 = ylow(index2) + (yhigh(index2)-ylow(index2))/3;
+%PLOT RESULTS
+fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',1,xclick1,yclick1);
+fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',1,xclick2,yclick2);
+%figure; imshow(plotPoints(img,clicks(:,2:3)));
 
-%c = randomColor();
-%newimg = highlightBox(img, [ylow(index1), xlow(index1)], ...
-%              xhigh(index1)-xlow(index1), yhigh(index1)-ylow(index1),... 
-%              BOX_WIDTH,ALPHA, c);
-%newimg = highlightBox(newimg, [ylow(index2), xlow(index2)], ...
-%              xhigh(index2)-xlow(index2), yhigh(index2)-ylow(index2),... 
-%              BOX_WIDTH,ALPHA, c);
-%imshow(newimg);
-
-clicks(1,:) = [frame xclick1, yclick1];
-clicks(2,:) = [frame xclick2, yclick2];
-
-figure; imshow(plotPoints(img,clicks(:,2:3)));
-    
 end
 
