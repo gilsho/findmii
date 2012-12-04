@@ -9,15 +9,15 @@ x_displacement_factor = [23.2733 0.1131];
 
 MAX_FRAME = 150;
 
-frame_interval = 1; %1 or 2 frames. currently 2 seems better
-lastframe = 1; 
+frame_interval = 2; %1 or 2 frames. currently 2 seems better
+lastframe = 2; 
 consecutive_click_count = 0;
 last_click_info = zeros(1,4);
 while (lastframe < MAX_FRAME)
     lastframe = lastframe + 1;
     %fprintf('Examining frame %d/%d...\n',lastframe,MAX_FRAME);
-    %img1 = read(mov_input,lastframe-2*frame_interval); 
-    img2 = read(mov_input,lastframe-frame_interval);
+    img1 = read(mov_input,lastframe-frame_interval); 
+    img2 = read(mov_input,lastframe);
     [m,n,~] = size(img1);
 
     %fprintf(1,'Computing SIFT features image...\n');

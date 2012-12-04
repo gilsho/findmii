@@ -1,6 +1,8 @@
 
 function clicks = FindMiiTask4Level1(datadir)
 
+MAX_FRAME = 150;
+
 mov_input = mmreader([datadir 't4l1.avi']);
 
 height_scale_factor = [100.4514 0.2655];
