@@ -32,7 +32,7 @@ bbox = [95    152   108   162
         234   297   511   573];
     
 numfaces = size(bbox,1);
-lastframe = 1
+lastframe = 1;
 CONFIDENCE_THRESHOLD = 1.5;
 confidence = 0;
 while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
