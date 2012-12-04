@@ -1,7 +1,6 @@
 
 
 function clicks = FindMiiTask3Level1(datadir)
-
 clicks = zeros(2,3);
 
 MAX_FRAME = 150;
@@ -33,8 +32,7 @@ bbox = [95    152   108   162
         234   297   511   573];
     
 numfaces = size(bbox,1);
-lastframe = 1;
-MINORITY_THRESHOLD = 4;
+lastframe = 1
 CONFIDENCE_THRESHOLD = 1.5;
 confidence = 0;
 while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
@@ -47,6 +45,7 @@ while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
     fprintf('Calculating optical flow for faces...\n');              
     faces = cell(numfaces,2);
     fmotion = zeros(numfaces,2);
+    fuv = cell(numfaces,1);
     for i=1:numfaces
 
         fprintf('.');
@@ -54,12 +53,27 @@ while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
         faces{i,2} = img2(bbox(i,1):bbox(i,2),bbox(i,3):bbox(i,4),:);
         
         uv = estimate_flow_interface(faces{i,1}, faces{i,2}, 'classic+nl-fast');
+        fuv{i} = uv(:,:,1);
         fmotion(i,1) = sum(sum(uv(:,:,1) > 0));
         fmotion(i,2) = sum(sum(uv(:,:,1) < 0));
         fmotion(i,:) = fmotion(i,:)./sum(sum(fmotion));
     end
     fprintf('\n');
-
+    
+    MOTION_THRESHOLD = 1.5;
+    %DETERMINE MOTION
+    avg_xmag = 0;
+    for i=1:numfaces
+       avg_xmag = avg_xmag + max(max(fuv{1})); 
+    end
+    avg_xmag = avg_xmag ./ numfaces;
+    
+    if (avg_xmag < MOTION_THRESHOLD)
+       fprintf('no motion detected.\n');
+       confidence = 0;
+       continue;
+    end
+    
     %DETERMINING ODD SIDE
     orient = zeros(size(fmotion));
     orient(:,1) = fmotion(:,1) > fmotion(:,2);
@@ -69,6 +83,7 @@ while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
     if (sum(orient(:,1)) > sum(orient(:,2)))
         minority_orientation = 2;
     end
+    MINORITY_THRESHOLD = 4;
     if (sum(orient(:,minority_orientation)) > MINORITY_THRESHOLD)
         confidence = 0;
         fprintf('Did not detect minority orientation!\n');
@@ -109,7 +124,7 @@ end
 %PLOT RESULTS
 fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',lastframe,xclick1,yclick1);
 fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',lastframe,xclick2,yclick2);
-%figure; imshow(plotPoints(img2,clicks(:,2:3)));
+figure; imshow(plotPoints(img2,clicks(:,2:3)));
 
 
 end
