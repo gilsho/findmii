@@ -1,7 +1,6 @@
 
 
-%function click = FindMiiTask3Level3(datadir)
-datadir = 'data/';
+function click = FindMiiTask3Level3(datadir)
 
 MAX_FRAME = 150;
 
@@ -119,5 +118,5 @@ fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',lastframe,xclick,yclic
 %figure; imshow(plotPoints(img2,click(1,2:3)));
 
 
-%end
+end
 
