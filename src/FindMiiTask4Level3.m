@@ -1,5 +1,4 @@
-%function clicks = FindMiiTask4Level3(datadir)
-datadir = 'data/';
+function clicks = FindMiiTask4Level3(datadir)
 clicks = zeros(1,3);
 
 mov_input = mmreader([datadir 't4l3.avi']);
@@ -113,7 +112,7 @@ fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',...
 %PLOT RESULTS
 %figure; imshow(plotPoints(img2,clicks(1,2:3s)));
 
-%end
+end
 
 
 
