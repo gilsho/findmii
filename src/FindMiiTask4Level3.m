@@ -1,5 +1,5 @@
-function clicks = FindMiiTask4Level3(datadir)
-
+%function clicks = FindMiiTask4Level3(datadir)
+datadir = 'data/';
 clicks = zeros(1,3);
 
 mov_input = mmreader([datadir 't4l3.avi']);
@@ -10,7 +10,7 @@ x_displacement_factor = [23.2733 0.1131];
 MAX_FRAME = 150;
 
 frame_interval = 2; %1 or 2 frames. currently 2 seems better
-lastframe = 2; 
+lastframe = 28; %CHANGE THIS BACK TO 2!!!!!!!!!!!!!!!!!!!!!!!!!! 
 consecutive_click_count = 0;
 last_click_info = zeros(1,4);
 while (lastframe < MAX_FRAME)
@@ -90,11 +90,11 @@ while (lastframe < MAX_FRAME)
         displacement12(maxindex,2)];
     
     img4 = highlightCircle(img2,[yclick xclick],5,2,1,[0,255,0]);
-    %imshow(img4);
+    imshow(img4);
     
     %COMPARE TO LAST CLICK POINT
     CLICK_DIFF_THRESHOLD = 5;
-    click_diff = norm(click_info - last_click_info);
+    click_diff = norm(click_info - last_click_info)
     last_click_info = click_info;
     if (click_diff < CLICK_DIFF_THRESHOLD)
         consecutive_click_count = consecutive_click_count + 1;
@@ -119,7 +119,7 @@ fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',...
 %img4 = highlightCircle(img4,[yclick xclick],5,2,1,[0,255,0]);
 %%figure; imshow(img4);
 
-end
+%end
 
 
 

@@ -1,7 +1,7 @@
 
 
-function click = FindMiiTask3Level3(datadir)
-
+%function click = FindMiiTask3Level3(datadir)
+datadir = 'data/';
 
 MAX_FRAME = 150;
 
@@ -10,7 +10,7 @@ click = zeros(1,3);
 mov_input = mmreader([datadir 't3l3.avi']);
 bg = imread('t3l3-bg.jpg');
 
-lastframe = 2;
+lastframe = 15;
 frame_interval = 2; 
 CONFIDENCE_THRESHOLD = 1.5;
 confidence = 0;
@@ -87,14 +87,14 @@ while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
            config(c) = 2;
         end
     end
-
+    sumflow, config
     %DETECT MINORITY CONFIGURATION
     minority_cluster = 0;
     if (sum(config==1) > sum(config==2))
-       minority_cluster = (config==2);
-    elseif (sum(config==1) < sum(config==2)) 
-       minority_cluster = (config==1);
+       minority_cluster = find(config==2);
        mag = 1./mag;
+    elseif (sum(config==1) < sum(config==2)) 
+       minority_cluster = find(config==1);
     else
         %no match
         continue
@@ -119,5 +119,5 @@ fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',lastframe,xclick,yclic
 %figure; imshow(plotPoints(img2,click(1,2:3)));
 
 
-end
+%end
 
