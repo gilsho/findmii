@@ -1,12 +1,11 @@
 
 
-%function clicks = FindMiiTask2Level3(datadir)
-datadir = 'data/';
+function clicks = FindMiiTask2Level3(datadir)
 clicks = zeros(2,3);
 
 % change the number accordingly for other tasks and levels
 mov_input = mmreader([datadir 't2l3.avi']);
-lastframe = 25;
+lastframe = 2;
 
 img1 = read(mov_input,lastframe-1); %1 or 2 frames. currently 2 seems better
 img2 = read(mov_input,lastframe);
@@ -109,7 +108,7 @@ fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',1,xclick,yclick);
 clicks(1,:) = [lastframe xclick1, yclick1];
 clicks(2,:) = [lastframe xclick2, yclick2];
 
-figure; imshow(plotPoints(img2,clicks(:,2:3)));
+%figure; imshow(plotPoints(img2,clicks(:,2:3)));
     
-%end
+end
 

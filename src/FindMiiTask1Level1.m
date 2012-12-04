@@ -130,7 +130,7 @@ click = [lastframe xclick, yclick];
 
 %PLOT RESULTS
 fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',lastframe,xclick,yclick);
-figure; imshow(plotPoints(img,[xclick yclick]));
+%figure; imshow(plotPoints(img,[xclick yclick]));
     
 % Scoring: correct click on frame 1 is worth 1 point, each frame
 % thereafter is discounted by 0.99. Score is averaged over multiple
