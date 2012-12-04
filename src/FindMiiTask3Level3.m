@@ -9,7 +9,7 @@ click = zeros(1,3);
 mov_input = mmreader([datadir 't3l3.avi']);
 bg = imread('t3l3-bg.jpg');
 
-lastframe = 15;
+lastframe = 2;
 frame_interval = 2; 
 CONFIDENCE_THRESHOLD = 1.5;
 confidence = 0;
@@ -86,7 +86,7 @@ while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
            config(c) = 2;
         end
     end
-    sumflow, config
+    
     %DETECT MINORITY CONFIGURATION
     minority_cluster = 0;
     if (sum(config==1) > sum(config==2))
