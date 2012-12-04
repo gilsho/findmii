@@ -11,7 +11,7 @@ width_scale_factor = [23.2733 0.1131];
 
 lastframe = 1;
 frame_interval = 1;
-CONFIDENCE_THRESHOLD = 1.5;
+CONFIDENCE_THRESHOLD = 2.5;
 confidence = 0;
 while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
     lastframe = lastframe + 1;
@@ -56,7 +56,6 @@ while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
     %FIND FASTEST CLUSTER
     [sorted_avg_values, sorted_indices] = sort(avg_values,'descend');
     max_cluster = sorted_indices(1);
-    
     confidence = sorted_avg_values(1)/sorted_avg_values(2);
 end
 
