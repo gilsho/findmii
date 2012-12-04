@@ -78,14 +78,15 @@ while (lastframe < MAX_FRAME)
     fprintf('frame:[%d].x:[%d], y:[%d] orient:[%d], disp:[%d]\n',...
         lastframe,xclick,yclick,displacement12(maxindex,2),...
         displacement12(maxindex,3));
-    
+
+ 
+    %img4 = highlightCircle(img2,[yclick xclick],5,2,1,[0,255,0]);
+    %imshow(img4);
     DISPLACEMENT_THRESHOLD = 13;
     if (maxval > DISPLACEMENT_THRESHOLD)
         fprintf('significant motion detected!\n');
         click_info = [xclick, yclick, displacement12(maxindex,2),...
             displacement12(maxindex,3),lastframe];
-        img4 = highlightCircle(img2,[yclick xclick],5,2,1,[0,255,0]);
-        %imshow(img4);
     else
         click_info = [0, 0, 0, 0, lastframe];
     end
@@ -101,7 +102,7 @@ while (lastframe < MAX_FRAME)
         break;
     end 
     
-    img4 = highlightCircle(img4,[yclick xclick],5,2,1,[255,0,0]);
+    %img4 = highlightCircle(img4,[yclick xclick],5,2,1,[255,0,0]);
     %imshow(img4);
     
 end
