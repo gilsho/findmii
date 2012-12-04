@@ -9,7 +9,7 @@ height_scale_factor = [100.4514 0.2655];
 width_scale_factor = [23.2733 0.1131];
 
 
-lastframe = 1;
+lastframe = 2; %CHANGE THIS BACK!!!!!!!!!!!!!!!!!!!!!
 frame_interval = 1;
 CONFIDENCE_THRESHOLD = 2.5;
 confidence = 0;
