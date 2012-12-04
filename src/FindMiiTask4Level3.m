@@ -10,9 +10,12 @@ x_displacement_factor = [23.2733 0.1131];
 MAX_FRAME = 150;
 
 frame_interval = 2; %1 or 2 frames. currently 2 seems better
-lastframe = 28; %CHANGE THIS BACK TO 2!!!!!!!!!!!!!!!!!!!!!!!!!! 
+lastframe = 2; 
 consecutive_click_count = 0;
-last_click_info = zeros(1,4);
+
+HISTORY = 10;
+click_history = zeros(HISTORY,5);
+
 while (lastframe < MAX_FRAME)
     lastframe = lastframe + 1;
     %fprintf('Examining frame %d/%d...\n',lastframe,MAX_FRAME);
@@ -77,47 +80,38 @@ while (lastframe < MAX_FRAME)
         lastframe,xclick,yclick,displacement12(maxindex,2),...
         displacement12(maxindex,3));
     
-    DISPLACEMENT_THRESHOLD = 17;
+    DISPLACEMENT_THRESHOLD = 13;
     if (maxval > DISPLACEMENT_THRESHOLD)
         fprintf('significant motion detected!\n');
+        click_info = [xclick, yclick, displacement12(maxindex,2),...
+            displacement12(maxindex,3),lastframe];
+        img4 = highlightCircle(img2,[yclick xclick],5,2,1,[0,255,0]);
+        %imshow(img4);
     else
-        consecutive_click_count = 0;
-        continue;
+        click_info = [0, 0, 0, 0, lastframe];
     end
     
-    weight = [1 1 10 10];
-    click_info = weight.*[xclick, yclick, displacement12(maxindex,2),...
-        displacement12(maxindex,2)];
-    
-    img4 = highlightCircle(img2,[yclick xclick],5,2,1,[0,255,0]);
-    imshow(img4);
-    
+    click_history = [click_info; click_history(1:HISTORY-1,:)];
+
     %COMPARE TO LAST CLICK POINT
-    CLICK_DIFF_THRESHOLD = 5;
-    click_diff = norm(click_info - last_click_info)
-    last_click_info = click_info;
-    if (click_diff < CLICK_DIFF_THRESHOLD)
-        consecutive_click_count = consecutive_click_count + 1;
-        fprintf('%d consecutive clicks on target\n', ...
-            consecutive_click_count);
-    else
-        consecutive_click_count = 0;
-    end
-    
-    MIN_CONSECUTIVE = 3;
-    if (consecutive_click_count > MIN_CONSECUTIVE)
+    SCORE_THRESHOLD = 0.5;
+    [yclick,xclick,score] = getClickFromHistory(img2,click_history);
+    fprintf('score: [%.2f]\n',score);
+    if (score > SCORE_THRESHOLD)
         clicks = [lastframe xclick yclick];
         break;
-    end
+    end 
+    
+    img4 = highlightCircle(img4,[yclick xclick],5,2,1,[255,0,0]);
+    %imshow(img4);
+    
 end
 
 fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',...
     lastframe,xclick,yclick);
 
 %PLOT RESULTS
-%ClickMii([datadir 't4l3.avi'], ['gt/' 't4l3.gt'], clicks)
-%img4 = highlightCircle(img4,[yclick xclick],5,2,1,[0,255,0]);
-%%figure; imshow(img4);
+%figure; imshow(plotPoints(img2,clicks(1,2:3s)));
 
 %end
 

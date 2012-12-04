@@ -10,38 +10,38 @@ x_displacement_factor = [23.2733 0.1131];
 
 MAX_FRAME = 150;
 
-frame_interval = 1; %1 or 2 frames. currently 2 seems better
-lastframe = 1; 
+frame_interval = 2; %1 or 2 frames. currently 2 seems better
+lastframe = 28; 
 consecutive_click_count = 0;
 last_click_info = zeros(1,4);
 while (lastframe < MAX_FRAME)
     lastframe = lastframe + 1;
     %fprintf('Examining frame %d/%d...\n',lastframe,MAX_FRAME);
     %img1 = read(mov_input,lastframe-2*frame_interval); 
-    img2 = read(mov_input,lastframe-frame_interval);
-    img3 = read(mov_input,lastframe);
-    [m,n,~] = size(img1);
+    img1 = read(mov_input,lastframe-frame_interval);
+    img2 = read(mov_input,lastframe);
+    [m,n,~] = size(img2);
 
     %fprintf(1,'Computing the SIFT features for face in reference image...\n');
-    img1bw = im2single(rgb2gray(img1));
-    [frames1, descriptors1] = vl_covdet(img1bw,'method', 'DoG');
+    %img1bw = im2single(rgb2gray(img1));
+    %[frames1, descriptors1] = vl_covdet(img1bw,'method', 'DoG');
     
     %CALCULATE OPTICAL FLOW
     %fprintf('Calculating optical flow...\n');
     %uv12 = estimate_flow_interface(img1, img2, 'classic+nl-fast');
     %uv23 = estimate_flow_interface(img2, img3, 'classic+nl-fast');
     
+    img1bw = im2single(rgb2gray(img1));
+    [frames1, descriptors1] = vl_covdet(img1bw,'method', 'DoG');
+    
     img2bw = im2single(rgb2gray(img2));
     [frames2, descriptors2] = vl_covdet(img2bw,'method', 'DoG');
-    
-    img3bw = im2single(rgb2gray(img2));
-    [frames3, descriptors3] = vl_covdet(img3bw,'method', 'DoG');
     
     %MATCH KEYPOINTS
     %fprintf(1,'Matching keypoints...');
     threshold = 0.5;
     matches12 = matchKeypoints(descriptors1, descriptors2, threshold);
-    matches23 = matchKeypoints(descriptors2, descriptors3, threshold);
+    %matches23 = matchKeypoints(descriptors2, descriptors3, threshold);
 
     
     %PLOT MATCHES
@@ -87,7 +87,7 @@ while (lastframe < MAX_FRAME)
         lastframe,xclick,yclick,displacement12(maxindex,2),...
         displacement12(maxindex,3));
     
-    DISPLACEMENT_THRESHOLD = 17;
+    DISPLACEMENT_THRESHOLD = 10;
     if (maxval > DISPLACEMENT_THRESHOLD)
         fprintf('significant motion detected!\n');
     else
@@ -103,7 +103,7 @@ while (lastframe < MAX_FRAME)
     imshow(img4);
     
     %COMPARE TO LAST CLICK POINT
-    CLICK_DIFF_THRESHOLD = 5;
+    CLICK_DIFF_THRESHOLD = 10;
     click_diff = norm(click_info - last_click_info);
     last_click_info = click_info;
     if (click_diff < CLICK_DIFF_THRESHOLD)
