@@ -1,7 +1,6 @@
 
 
 function clicks = FindMiiTask2Level1(datadir)
-datadir = 'data/';
 
 MAX_FRAME = 150;
 

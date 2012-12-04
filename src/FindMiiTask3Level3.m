@@ -1,6 +1,6 @@
 
 
-function clicks = FindMiiTask3Level1(datadir)
+function click = FindMiiTask3Level3(datadir)
 
 
 MAX_FRAME = 150;
@@ -10,8 +10,8 @@ click = zeros(1,3);
 mov_input = mmreader([datadir 't3l3.avi']);
 bg = imread('t3l3-bg.jpg');
 
-lastframe = 2;
-frame_interval = 2;
+lastframe = 1;
+frame_interval = 1; %careful!
 CONFIDENCE_THRESHOLD = 1.5;
 confidence = 0;
 while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))

@@ -1,5 +1,3 @@
-
-
 %%-----------------------------------------------------------------------%%
 %                                                                         
 % CS231A Project: Find Mii
@@ -11,13 +9,15 @@
 %
 %%-----------------------------------------------------------------------%%
 
-function click = FindMiiTask2Level2(datadir)
+function click = FindMiiTask1Level3(datadir)
 
-click = zeros(2,3);
+click = zeros(1,3);
 
 MAX_FRAME = 150;
 
-mov_input = mmreader([datadir 't2l2.avi']);
+mov_input = mmreader([datadir 't1l3.avi']);
+
+ref_img = imread([datadir 'ref-task1level3.bmp']);
 
 %LOAD MASKS
 space_mask = double(rgb2gray(imread('space-mask.jpg'))) > 128;
@@ -33,15 +33,12 @@ while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
     img2 = read(mov_input,lastframe-1);
     img3 = read(mov_input,lastframe);
 
-    datadir = 'data/';
-    ref_img = imread([datadir 'ref-task1level1.bmp']);
-
     %COMPUTE OPTICAL FLOW
     fprintf(1,'Computing optical flow..\n');
     flow1 = estimate_flow_interface(img1, img2, 'classic+nl-fast');
     flow2 = estimate_flow_interface(img2, img3, 'classic+nl-fast');
 
-    uvmag = sqrt(flow(:,:,2).^2+flow(:,:,1).^2);
+    uvmag = sqrt(flow2(:,:,2).^2+flow2(:,:,1).^2);
     uvorient = atan2(flow(:,:,2),flow(:,:,1));
 
     %PERFORM CLUSTERING
@@ -88,6 +85,11 @@ while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
     end
 
     %DETECT SIFT FEATURES
+    fprintf(1,'Computing the SIFT features for face in reference image...\n');
+    imgbw = im2single(rgb2gray(ref_img));
+    [ref_frames, ref_descriptors] = vl_covdet(imgbw,'method', 'DoG',...
+                                        'EstimateOrientation', true);
+
     fprintf(1,'Computing the SIFT features for faces in frame');
     frames = cell(numfaces,1);
     descriptors = cell(numfaces,1);
@@ -103,54 +105,37 @@ while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
     %MATCH KEYPOINTS
     fprintf(1,'Matching keypoints...\n');
     threshold = 0.8;
-    score = zeros(numfaces);
+    score = zeros(numfaces,1);
     for i=1:numfaces
-        for j=1:numfaces
-            if (i == j)
-                score(i,j) = 0;
-            else
-                matches = matchKeypoints(descriptors{i},descriptors{j},threshold);
-                score(i,j) = numel(matches);
-            end
-        end
+        matches = matchKeypoints(ref_descriptors,descriptors{i},threshold);
+        score(i) = numel(matches);
     end
-    
-    %DETERMINE MATCH
-    [maxvalscol maxindexcol] = max(score);
-    [maxval, maxindexrow] = max(maxvalscol);
 
-    index1 = maxindexrow;
-    index2 = maxindexcol(maxindexrow);
-    
-    score_remaining = score;
-    score_remaining(index1,index2) = 0;
-    score_remaining(index2,index1) = 0;
-    
-    max_remaining = max(max(score_remaining));
-    
-    confidence = maxval./max_remaining;
+    %PRINT BOUNDING BOXES
+    img4 = img2;
+    for c=1:size(cluster_centers,1)
+        if (score(c) < 1)
+            continue;
+        end
+        img4 = highlightBox(img4,cluster_dim(c,1),cluster_dim(c,2),cluster_dim(c,3),...
+            cluster_dim(c,4),5,0,[255,0,0]);
+
+    end
+    %figure; imshow(img4);
+
+    %CALCULATE CONFIDENCE LEVEL
+    [score_sorted,sorted_index] = sort(score,'Descend');    
+    confidence = score_sorted(1) > 4;
 
 end
 
 if (confidence >= CONFIDENCE_THRESHOLD)
-    xclick1 = bbox(index1,3) + (bbox(index1,4)-bbox(index1,3))/2;
-    yclick1 = bbox(index1,1) + (bbox(index1,2)-bbox(index1,1))/3;
+    yclick = cluster_centers(minority_cluster,1);
+    xclick = cluster_centers(minority_cluster,2);
 
-    xclick2 = bbox(index2,3) + (bbox(index2,4)-bbox(index2,3))/2;
-    yclick2 = bbox(index2,1) + (bbox(index2,2)-bbox(index2,1))/3;
-
-    click = zeros(2,3);
-    click(1,:) = [lastframe xclick1, yclick1];
-    click(2,:) = [lastframe xclick2, yclick2];
+    click = [lastframe xclick yclick];
 end
-
-%RESULTS
-fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',1,xclick1,yclick1);
-fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',1,xclick2,yclick2);
-%figure; imshow(plotPoints(img2,clicks(:,2:3)));
 
     
 end
-
-
 

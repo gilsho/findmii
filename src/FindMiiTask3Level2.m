@@ -48,7 +48,7 @@ bbox = [121  167  126  165
         259  308  566  615 ];
         
 numfaces = size(bbox,1);
-lastframe = 4;
+lastframe = 1;
 MINORITY_THRESHOLD = 6;
 CONFIDENCE_THRESHOLD = 1.5;
 confidence = 0;
@@ -109,7 +109,6 @@ while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
     findex3 = rank(3);
     
     confidence = motion_mag_sorted(3);
-    confidence, motion_mag_sorted
 
 end
 

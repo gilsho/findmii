@@ -50,8 +50,6 @@ while (confidence < CONFIDENCE_THRESHOLD && lastframe < MAX_FRAME)
     
     %MATCH KEYPOINTS
     fprintf(1,'Matching keypoints...');
-    ref_box = [40 40 120 120];
-    minpts = 2;
     threshold = 0.8;
     matches = matchKeypoints(ref_descriptors, descriptors, threshold);
 
@@ -74,7 +72,7 @@ end
 click = [lastframe xclick, yclick];
 
 %PLOT RESULTS                                            
-fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',1,xclick,yclick);
+fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',lastframe,xclick,yclick);
 %figure; imshow(plotPoints(img,[xclick yclick]));
     
 end
