@@ -33,9 +33,6 @@ while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
     img2 = read(mov_input,lastframe-1);
     img3 = read(mov_input,lastframe);
 
-    datadir = 'data/';
-    ref_img = imread([datadir 'ref-task1level1.bmp']);
-
     %COMPUTE OPTICAL FLOW
     fprintf(1,'Computing optical flow..\n');
     flow1 = estimate_flow_interface(img1, img2, 'classic+nl-fast');
