@@ -15,8 +15,6 @@ height_scale_factor = [100.4514 0.2655];
 width_scale_factor = [23.2733 0.1131];
 
 uv = estimate_flow_interface(img1, img2, 'classic+nl-fast');
-%load ofdata_2-3
-save ofdata_2-3
 
 %apply scale gradient to flow
 rowscale = ones(m,n)*height_scale_factor(1) + ...
@@ -43,7 +41,7 @@ for c=1:clusters
     img4 = highlightBox(img4,cluster_dim(c,1),cluster_dim(c,2),cluster_dim(c,3),...
         cluster_dim(c,4),5,0,[255,0,0]);
 end
-figure; imshow(img4);      
+%figure; imshow(img4);      
       
 %%%%%%%%%%%%%%%%
 
@@ -51,7 +49,7 @@ figure; imshow(img4);
 % Detect the SIFT features:
 fprintf(1,'Computing the SIFT features for entire frame...\n');
 [frame, descriptors] = vl_covdet(imgbw,'method', 'DoG');
-figure; imshow(img); hold on; vl_plotframe(frame); hold off;
+%figure; imshow(img); hold on; vl_plotframe(frame); hold off;
 
 
 %Texture mask
