@@ -8,8 +8,7 @@ run('startup');
 %for t=1:4
 %for l=1:3
     if ~isempty(dir(sprintf('FindMiiTask%dLevel%d.m',t,l)));
-        %path = '/afs/ir/class/cs231a/findmii/data/';
-        path = '../data/';
+        path = '/afs/ir/class/cs231a/findmii/data/';
         % run the program
         if(t==1 && l==1)
             click = FindMiiTask1Level1(path);
