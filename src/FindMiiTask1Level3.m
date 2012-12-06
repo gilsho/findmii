@@ -24,7 +24,7 @@ space_mask = double(rgb2gray(imread('space-mask.jpg'))) > 128;
 earth_mask = double(rgb2gray(imread('earth-mask.jpg'))) > 128;
 
 
-lastframe = 8;
+lastframe = 3;
 confidence = -Inf;
 CONFIDENCE_THRESHOLD = 0.5;
 while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
