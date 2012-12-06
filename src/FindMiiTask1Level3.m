@@ -132,8 +132,8 @@ while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
 end
 
 if (confidence >= CONFIDENCE_THRESHOLD)
-    yclick = cluster_centers(minority_cluster,1);
-    xclick = cluster_centers(minority_cluster,2);
+    yclick = cluster_centers(sorted_index(1),1);
+    xclick = cluster_centers(sorted_index(2),2);
 
     click = [lastframe xclick yclick];
 end
