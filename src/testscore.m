@@ -1,13 +1,15 @@
 % score the project
-fid2 = fopen(strcat('score.report.', 'TEST') ,'w');
+function testscore(t,l)
+fid2 = fopen(strcat('score.report.', 'TEST_t', num2str(t), 'l', num2str(l)) ,'w');
 nclick = [1 1 1; 2 2 2; 2 3 1; 1 1 1];
 scores = zeros(1, 12);
-!make
-
-for t=1:4
-for l=1:3
+%!make
+run('startup');
+%for t=1:4
+%for l=1:3
     if ~isempty(dir(sprintf('FindMiiTask%dLevel%d.m',t,l)));
-        path = '/afs/ir/class/cs231a/findmii/data/';
+        %path = '/afs/ir/class/cs231a/findmii/data/';
+        path = '../data/';
         % run the program
         if(t==1 && l==1)
             click = FindMiiTask1Level1(path);
@@ -62,10 +64,17 @@ for l=1:3
 
         fprintf(fid2, '%1.4f, ', scores(1,(t-1)*3+l));
     else
+        fprintf('Skipping Task %d Level %d\n',t,l);
         % didn't do this task&level, the -1 is just a mark, won't penalize
         % final score,
         scores(1,(t-1)*3+l) = -1;
         fprintf(fid2, 'NA, ', scores(1,(t-1)*3+l));
     end
-end
+    
+    fprintf('Score for Task %d Level %d is [%d]\n',t,l,scores(1,(t-1)*3+l));
+%end
+%end
+
+fclose(fid2);
+
 end
