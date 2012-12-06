@@ -21,6 +21,7 @@ mov_input = mmreader([datadir 't2l2.avi']);
 
 %LOAD MASKS
 space_mask = double(rgb2gray(imread('space-mask.jpg'))) > 128;
+earth_mask = double(rgb2gray(imread('earth-mask.jpg'))) > 128;
 
 lastframe = 2;
 confidence = -Inf;
