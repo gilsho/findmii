@@ -38,8 +38,8 @@ while ((confidence < CONFIDENCE_THRESHOLD) && (lastframe < MAX_FRAME))
     flow1 = estimate_flow_interface(img1, img2, 'classic+nl-fast');
     flow2 = estimate_flow_interface(img2, img3, 'classic+nl-fast');
 
-    uvmag = sqrt(flow(:,:,2).^2+flow(:,:,1).^2);
-    uvorient = atan2(flow(:,:,2),flow(:,:,1));
+    uvmag = sqrt(flow2(:,:,2).^2+flow2(:,:,1).^2);
+    uvorient = atan2(flow2(:,:,2),flow2(:,:,1));
 
     %PERFORM CLUSTERING
     fprintf(1,'Clustering characters...\n');

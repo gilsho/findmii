@@ -124,7 +124,7 @@ end
 %PLOT RESULTS
 fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',lastframe,xclick1,yclick1);
 fprintf(1,'Suggested Click: frame:[%d], x:[%d], y:[%d]\n',lastframe,xclick2,yclick2);
-figure; imshow(plotPoints(img2,clicks(:,2:3)));
+%figure; imshow(plotPoints(img2,clicks(:,2:3)));
 
 
 end
